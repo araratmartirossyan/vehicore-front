@@ -179,6 +179,13 @@ export interface UsageOverview {
     prefix?: string
     createdAt?: string
     status?: string
+    products?: Array<{
+      product?: string
+      remainingCredits?: number
+      usedCredits?: number
+      totalCredits?: number
+      purchasedCredits?: number
+    }>
   }>
   products?: Array<{
     product?: string
