@@ -1,10 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { AuthLayout } from '../../components/layout/AuthLayout'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
+import { PasswordInput } from '../../components/ui/password-input'
 import { Label } from '../../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { useAuth } from '../../hooks/useAuth'
@@ -13,30 +14,69 @@ import { signUpSchema, type SignUpFormData } from '../../utils/validators'
 export function SignUpPage() {
   const navigate = useNavigate()
   const { signUp, isAuthenticated, authLoading, authError } = useAuth()
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false)
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
   })
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !showEmailConfirmation) {
       navigate('/dashboard', { replace: true })
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated, navigate, showEmailConfirmation])
 
   const onSubmit = async (data: SignUpFormData) => {
     const { confirmPassword, ...rest } = data
-    await signUp({
-      ...rest,
-      role: 'client',
-    })
-    if (isAuthenticated) {
-      navigate('/dashboard')
+    try {
+      await signUp({
+        ...rest,
+        role: 'client',
+      })
+      // Show email confirmation message instead of redirecting
+      setShowEmailConfirmation(true)
+      reset()
+    } catch (error) {
+      // Error handled by store
     }
+  }
+
+  if (showEmailConfirmation) {
+    return (
+      <AuthLayout>
+        <Card>
+          <CardHeader>
+            <CardTitle>Check your email</CardTitle>
+            <CardDescription>We've sent you a confirmation link</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Please check your email inbox and click the confirmation link to verify your account.
+              You'll be able to sign in after confirming your email.
+            </p>
+            <div className="flex flex-col gap-2">
+              <Link to="/login">
+                <Button variant="outline" className="w-full">
+                  Go to login
+                </Button>
+              </Link>
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={() => setShowEmailConfirmation(false)}
+              >
+                Back to sign up
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </AuthLayout>
+    )
   }
 
   return (
@@ -55,14 +95,22 @@ export function SignUpPage() {
             )}
             <div className="space-y-2">
               <Label htmlFor="firstName">First name</Label>
-              <Input id="firstName" placeholder="Test" {...register('firstName')} />
+              <Input
+                id="firstName"
+                placeholder="John"
+                {...register('firstName')}
+              />
               {errors.firstName && (
                 <p className="text-sm text-destructive">{errors.firstName.message}</p>
               )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="lastName">Last name</Label>
-              <Input id="lastName" placeholder="User" {...register('lastName')} />
+              <Input
+                id="lastName"
+                placeholder="Doe"
+                {...register('lastName')}
+              />
               {errors.lastName && (
                 <p className="text-sm text-destructive">{errors.lastName.message}</p>
               )}
@@ -72,7 +120,7 @@ export function SignUpPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="name@example.com"
+                placeholder="john.doe@example.com"
                 {...register('email')}
               />
               {errors.email && (
@@ -81,22 +129,24 @@ export function SignUpPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
-                placeholder="••••••••"
+                placeholder="Enter a strong password"
                 {...register('password')}
               />
+              <p className="text-xs text-muted-foreground">
+                Password must be at least 8 characters and include uppercase, lowercase, number, and
+                special character
+              </p>
               {errors.password && (
                 <p className="text-sm text-destructive">{errors.password.message}</p>
               )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
-                placeholder="••••••••"
+                placeholder="Re-enter your password"
                 {...register('confirmPassword')}
               />
               {errors.confirmPassword && (
@@ -109,7 +159,7 @@ export function SignUpPage() {
           </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}
-            <Link to="/login" className="text-primary hover:underline">
+            <Link to="/login" className="text-primary font-medium underline underline-offset-4 hover:text-primary/80">
               Sign in
             </Link>
           </div>

@@ -9,8 +9,9 @@ export const loginFx = createEffect<LoginRequest, User>((credentials) =>
   authService.login(credentials).then((response) => response.user)
 )
 
-export const signUpFx = createEffect<SignUpRequest, User>((data) =>
-  authService.signUp(data).then((response) => response.user)
+// Signup does NOT authenticate the user; email confirmation required.
+export const signUpFx = createEffect<SignUpRequest, void>((data) =>
+  authService.signUp(data).then(() => undefined)
 )
 
 export const forgotPasswordFx = createEffect<string, void>((email) =>
@@ -53,14 +54,8 @@ sample({
 
 // Update stores on signup
 sample({
-  clock: signUpFx.doneData,
-  fn: (user) => user,
-  target: $user,
-})
-
-sample({
   clock: signUpFx.done,
-  fn: () => true,
+  fn: () => false,
   target: $isAuthenticated,
 })
 

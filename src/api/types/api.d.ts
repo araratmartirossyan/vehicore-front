@@ -19,7 +19,7 @@ export interface SignUpRequest {
 }
 
 export interface SignUpResponse {
-  accessToken: string
+  accessToken?: string
   refreshToken?: string
   user: User
 }
@@ -92,12 +92,45 @@ export interface BillingHistoryItem {
   status: string
 }
 
+export interface Product {
+  id?: string
+  _id?: string
+  name: string
+  slug: string
+  description?: string
+  active?: boolean
+}
+
+export interface Package {
+  id?: string
+  _id?: string
+  product: string
+  name: string
+  currency: string
+  priceCents: number
+  credits: number
+  active?: boolean
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface CheckoutRequest {
+  packageId: string
+  apiKeyId: string
+}
+
+export interface CheckoutResponse {
+  url: string
+  id: string
+}
+
 // API Key types
 export interface ApiKey {
   id?: string
   _id?: string
   name: string
-  key: string
+  key?: string // Only present when first created
+  prefix?: string // Shown in list view
   createdAt: string
   lastUsedAt?: string
   // Some APIs keep revoked keys in list responses; these fields help us hide them in UI.
@@ -110,6 +143,14 @@ export interface ApiKey {
 
 export interface CreateApiKeyRequest {
   name: string
+}
+
+export interface CreateApiKeyResponse {
+  id?: string
+  _id?: string
+  name: string
+  apiKey: string // Plaintext key shown only once
+  createdAt?: string
 }
 
 // Usage types

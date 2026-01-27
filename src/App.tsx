@@ -1,12 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { DashboardLayout } from './components/layout/DashboardLayout'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { SmartRedirect } from './components/SmartRedirect'
 import { LoginPage } from './pages/Login/LoginPage'
 import { SignUpPage } from './pages/SignUp/SignUpPage'
 import { ForgotPasswordPage } from './pages/ForgotPassword/ForgotPasswordPage'
 import { ResetPasswordPage } from './pages/ResetPassword/ResetPasswordPage'
 import { ResetPasswordRedirect } from './pages/ResetPassword/ResetPasswordRedirect'
 import { ConfirmEmailPage } from './pages/ConfirmEmail/ConfirmEmailPage'
+import { CheckoutSuccessPage } from './pages/Checkout/CheckoutSuccessPage'
+import { CheckoutCancelPage } from './pages/Checkout/CheckoutCancelPage'
 import { DashboardPage } from './pages/Dashboard/DashboardPage'
 import { SettingsPage } from './pages/Settings/SettingsPage'
 import { BillingPage } from './pages/Billing/BillingPage'
@@ -27,6 +30,23 @@ function App() {
         <Route path="/api/auth/forgot-password" element={<ResetPasswordRedirect />} />
         {/* Redirect API-style confirmation links to the SPA confirmation page */}
         <Route path="/api/auth/confirm-email" element={<ConfirmEmailPage />} />
+        {/* Checkout pages - protected since they need auth to poll usage */}
+        <Route
+          path="/checkout/success"
+          element={
+            <ProtectedRoute>
+              <CheckoutSuccessPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkout/cancel"
+          element={
+            <ProtectedRoute>
+              <CheckoutCancelPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Protected routes */}
         <Route
@@ -80,8 +100,15 @@ function App() {
           }
         />
 
-        {/* Default redirect */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        {/* Default redirect - smart routing based on token/key status */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <SmartRedirect />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   )

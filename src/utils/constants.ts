@@ -20,8 +20,9 @@ export const API_ENDPOINTS = {
     BY_ID: '/api/users/:id',
   },
   BILLING: {
-    INFO: '/billing',
-    HISTORY: '/billing/history',
+    PRODUCTS: '/api/billing/products',
+    PACKAGES: '/api/packages',
+    CHECKOUT: '/api/billing/checkout',
   },
   API_KEYS: {
     LIST: '/api/keys',

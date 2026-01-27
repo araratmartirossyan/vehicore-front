@@ -70,7 +70,7 @@ export function ForgotPasswordPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="name@example.com"
+                placeholder="your.email@example.com"
                 {...register('email')}
               />
               {errors.email && (
@@ -83,7 +83,7 @@ export function ForgotPasswordPage() {
           </form>
           <div className="mt-4 text-center text-sm">
             Remember your password?{' '}
-            <Link to="/login" className="text-primary hover:underline">
+            <Link to="/login" className="text-primary font-medium underline underline-offset-4 hover:text-primary/80">
               Sign in
             </Link>
           </div>
