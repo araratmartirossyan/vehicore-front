@@ -5,6 +5,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import { AuthLayout } from '../../components/layout/AuthLayout'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
+import { PasswordInput } from '../../components/ui/password-input'
 import { Label } from '../../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { useAuth } from '../../hooks/useAuth'
@@ -81,7 +82,7 @@ export function ResetPasswordPage() {
                 <Label htmlFor="token">Reset Token</Label>
                 <Input
                   id="token"
-                  placeholder="Enter reset token"
+                  placeholder="Paste your reset token here"
                   {...register('token')}
                 />
                 {errors.token && (
@@ -91,22 +92,24 @@ export function ResetPasswordPage() {
             )}
             <div className="space-y-2">
               <Label htmlFor="newPassword">New Password</Label>
-              <Input
+              <PasswordInput
                 id="newPassword"
-                type="password"
-                placeholder="••••••••"
+                placeholder="Enter a strong password"
                 {...register('newPassword')}
               />
+              <p className="text-xs text-muted-foreground">
+                Password must be at least 8 characters and include uppercase, lowercase, number, and
+                special character
+              </p>
               {errors.newPassword && (
                 <p className="text-sm text-destructive">{errors.newPassword.message}</p>
               )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
-                placeholder="••••••••"
+                placeholder="Re-enter your new password"
                 {...register('confirmPassword')}
               />
               {errors.confirmPassword && (
@@ -118,7 +121,7 @@ export function ResetPasswordPage() {
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            <Link to="/login" className="text-primary hover:underline">
+            <Link to="/login" className="text-primary font-medium underline underline-offset-4 hover:text-primary/80">
               Back to login
             </Link>
           </div>

@@ -63,10 +63,12 @@ export function ConfirmEmailPage() {
             <CardTitle>Email confirmed!</CardTitle>
             <CardDescription>Your email has been successfully verified</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              You can now sign in to your account.
-            </p>
+          <CardContent className="space-y-6 pt-6">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                You can now sign in to your account.
+              </p>
+            </div>
             <Link to="/login">
               <Button className="w-full">Go to login</Button>
             </Link>
@@ -83,9 +85,9 @@ export function ConfirmEmailPage() {
           <CardTitle>Email confirmation failed</CardTitle>
           <CardDescription>We couldn't confirm your email address</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6 pt-6">
           <p className="text-sm text-destructive">{error}</p>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <Link to="/login">
               <Button variant="outline" className="w-full">
                 Go to login

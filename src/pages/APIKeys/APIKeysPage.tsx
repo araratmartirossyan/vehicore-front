@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from '../../components/ui/dialog'
 import { useApiKeys } from '../../hooks/useApiKeys'
-import type { ApiKey } from '../../api/types/api.d'
+import type { CreateApiKeyResponse } from '../../api/types/api.d'
 
 const createApiKeySchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
@@ -24,10 +24,11 @@ const createApiKeySchema = z.object({
 type CreateApiKeyFormData = z.infer<typeof createApiKeySchema>
 
 export function APIKeysPage() {
-  const { apiKeys, loading, newlyCreatedKey, listApiKeys, createApiKey, deleteApiKey } = useApiKeys()
+  const { apiKeys, loading, newlyCreatedKey, listApiKeys, createApiKey, deleteApiKey, clearNewlyCreatedKey } =
+    useApiKeys()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null)
-  const [showNewKey, setShowNewKey] = useState<ApiKey | null>(null)
+  const [showNewKey, setShowNewKey] = useState<CreateApiKeyResponse | null>(null)
   const [userActionError, setUserActionError] = useState<string | null>(null)
   const hasLoadedRef = useRef(false)
 
@@ -147,20 +148,26 @@ export function APIKeysPage() {
               <Label>API Key</Label>
               <div className="flex items-center gap-2">
                 <Input
-                  value={showNewKey.key}
+                  value={showNewKey.apiKey}
                   readOnly
                   className="font-mono text-sm bg-background"
                 />
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleCopy(showNewKey.key, showNewKey.id || showNewKey._id || '')}
+                  onClick={() => handleCopy(showNewKey.apiKey, showNewKey.id || showNewKey._id || '')}
                 >
                   {copiedKeyId === (showNewKey.id || showNewKey._id) ? 'Copied!' : 'Copy'}
                 </Button>
               </div>
             </div>
-            <Button variant="outline" onClick={() => setShowNewKey(null)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowNewKey(null)
+                clearNewlyCreatedKey()
+              }}
+            >
               I've saved my key
             </Button>
           </CardContent>
@@ -199,14 +206,14 @@ export function APIKeysPage() {
                         <tr key={keyId} className="border-b">
                           <td className="px-4 py-3 text-sm">{key.name}</td>
                           <td className="px-4 py-3 text-sm font-mono">
-                            {key.key ? (
+                            {key.prefix ? (
                               <div className="flex items-center gap-2">
-                                <span className="truncate max-w-[200px]">{key.key}</span>
+                                <span className="truncate max-w-[200px]">{key.prefix}...</span>
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   className="h-6 px-2"
-                                  onClick={() => handleCopy(key.key, keyId)}
+                                  onClick={() => handleCopy(key.prefix || '', keyId)}
                                 >
                                   {copiedKeyId === keyId ? 'Copied!' : 'Copy'}
                                 </Button>

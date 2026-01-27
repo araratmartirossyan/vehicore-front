@@ -1,6 +1,6 @@
 import apiClient from '../client'
 import { API_ENDPOINTS } from '../../utils/constants'
-import type { ApiKey, CreateApiKeyRequest } from '../types/api.d'
+import type { ApiKey, CreateApiKeyRequest, CreateApiKeyResponse } from '../types/api.d'
 
 export const apiKeysRepository = {
   list: async (): Promise<ApiKey[]> => {
@@ -8,8 +8,8 @@ export const apiKeysRepository = {
     return response.data
   },
 
-  create: async (data: CreateApiKeyRequest): Promise<ApiKey> => {
-    const response = await apiClient.post<ApiKey>(API_ENDPOINTS.API_KEYS.CREATE, data)
+  create: async (data: CreateApiKeyRequest): Promise<CreateApiKeyResponse> => {
+    const response = await apiClient.post<CreateApiKeyResponse>(API_ENDPOINTS.API_KEYS.CREATE, data)
     return response.data
   },
 

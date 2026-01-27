@@ -1,6 +1,6 @@
-import { createStore, createEffect, sample } from 'effector'
+import { createStore, createEffect, sample, createEvent } from 'effector'
 import { apiKeysRepository } from '../api/repositories/apiKeys.repo'
-import type { ApiKey, CreateApiKeyRequest } from '../api/types/api.d'
+import type { ApiKey, CreateApiKeyRequest, CreateApiKeyResponse } from '../api/types/api.d'
 
 function isRevoked(key: ApiKey): boolean {
   // Try to be compatible with whatever the backend returns
@@ -15,7 +15,7 @@ function isRevoked(key: ApiKey): boolean {
 // Effects
 export const listApiKeysFx = createEffect<void, ApiKey[]>(() => apiKeysRepository.list())
 
-export const createApiKeyFx = createEffect<CreateApiKeyRequest, ApiKey>((data) =>
+export const createApiKeyFx = createEffect<CreateApiKeyRequest, CreateApiKeyResponse>((data) =>
   apiKeysRepository.create(data)
 )
 
@@ -23,11 +23,15 @@ export const deleteApiKeyFx = createEffect<string, string>((id) =>
   apiKeysRepository.delete(id).then(() => id)
 )
 
+// Events
+export const clearNewlyCreatedKey = createEvent<void>()
+
 // Stores
 export const $apiKeys = createStore<ApiKey[]>([])
 export const $apiKeysLoading = createStore<boolean>(false)
 export const $apiKeysError = createStore<string | null>(null)
-export const $newlyCreatedKey = createStore<ApiKey | null>(null)
+export const $newlyCreatedKey = createStore<CreateApiKeyResponse | null>(null)
+  .on(clearNewlyCreatedKey, () => null)
 
 // Update stores on list success
 sample({
@@ -36,17 +40,27 @@ sample({
   target: $apiKeys,
 })
 
-// Update stores on create success
+// Update stores on create success - store the full response with plaintext key
 sample({
   clock: createApiKeyFx.doneData,
   fn: (newKey) => newKey,
   target: $newlyCreatedKey,
 })
 
+// Add the key to the list (without the plaintext apiKey field)
 sample({
   clock: createApiKeyFx.done,
   source: $apiKeys,
-  fn: (keys, { result }) => [result, ...keys],
+  fn: (keys, { result }) => {
+    const keyWithoutPlaintext: ApiKey = {
+      id: result.id || result._id,
+      _id: result._id,
+      name: result.name,
+      createdAt: result.createdAt || new Date().toISOString(),
+      prefix: result.apiKey.substring(0, 8) + '...', // Show prefix for display
+    }
+    return [keyWithoutPlaintext, ...keys]
+  },
   target: $apiKeys,
 })
 
@@ -77,11 +91,4 @@ sample({
   clock: [listApiKeysFx.done, createApiKeyFx.done, deleteApiKeyFx.done],
   fn: () => null,
   target: $apiKeysError,
-})
-
-// Clear newly created key after a delay
-sample({
-  clock: createApiKeyFx.done,
-  fn: () => null,
-  target: $newlyCreatedKey,
 })

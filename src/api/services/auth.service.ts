@@ -20,14 +20,13 @@ export const authService = {
 
   signUp: async (data: SignUpRequest) => {
     const response = await authRepository.signUp(data)
-
-    // Store tokens
-    if (response.accessToken) {
-      setStorageItem(STORAGE_KEYS.ACCESS_TOKEN, response.accessToken)
-    }
-    if (response.refreshToken) {
-      setStorageItem(STORAGE_KEYS.REFRESH_TOKEN, response.refreshToken)
-    }
+    /**
+     * Signup requires email confirmation before login.
+     * Do NOT store tokens or mark the user as authenticated here.
+     * Also clear any existing tokens to avoid accidental "logged-in" state.
+     */
+    removeStorageItem(STORAGE_KEYS.ACCESS_TOKEN)
+    removeStorageItem(STORAGE_KEYS.REFRESH_TOKEN)
 
     return response
   },

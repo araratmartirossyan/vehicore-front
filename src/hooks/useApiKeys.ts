@@ -7,6 +7,7 @@ import {
   listApiKeysFx,
   createApiKeyFx,
   deleteApiKeyFx,
+  clearNewlyCreatedKey,
 } from '../stores/apiKeys.store'
 import type { CreateApiKeyRequest } from '../api/types/api.d'
 
@@ -24,5 +25,6 @@ export function useApiKeys() {
     listApiKeys: () => listApiKeysFx(),
     createApiKey: (data: CreateApiKeyRequest) => createApiKeyFx(data),
     deleteApiKey: (id: string) => deleteApiKeyFx(id),
+    clearNewlyCreatedKey: () => clearNewlyCreatedKey(),
   }
 }

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
-import { Input } from '../../components/ui/input'
+import { PasswordInput } from '../../components/ui/password-input'
 import { Label } from '../../components/ui/label'
 import { useAuth } from '../../hooks/useAuth'
 import { changePasswordSchema, type ChangePasswordFormData } from '../../utils/validators'
@@ -88,9 +88,8 @@ export function SettingsPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="oldPassword">Current Password</Label>
-              <Input
+              <PasswordInput
                 id="oldPassword"
-                type="password"
                 placeholder="Enter your current password"
                 {...register('oldPassword')}
                 disabled={authLoading}
@@ -101,23 +100,25 @@ export function SettingsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="newPassword">New Password</Label>
-              <Input
+              <PasswordInput
                 id="newPassword"
-                type="password"
-                placeholder="Enter your new password"
+                placeholder="Enter a strong password"
                 {...register('newPassword')}
                 disabled={authLoading}
               />
+              <p className="text-xs text-muted-foreground">
+                Password must be at least 8 characters and include uppercase, lowercase, number, and
+                special character
+              </p>
               {errors.newPassword && (
                 <p className="text-sm text-destructive">{errors.newPassword.message}</p>
               )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm New Password</Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
-                placeholder="Confirm your new password"
+                placeholder="Re-enter your new password"
                 {...register('confirmPassword')}
                 disabled={authLoading}
               />
