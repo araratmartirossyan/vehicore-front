@@ -33,6 +33,7 @@ export function SignUpPage() {
 
   const onSubmit = async (data: SignUpFormData) => {
     const { confirmPassword, ...rest } = data
+    void confirmPassword
     try {
       await signUp({
         ...rest,

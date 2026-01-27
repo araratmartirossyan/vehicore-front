@@ -96,7 +96,7 @@ export function APIKeysPage() {
     }
   }
 
-  const formatDate = (dateString?: string) => {
+  const formatDate = (dateString?: string | null) => {
     if (!dateString) return 'Never'
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -174,80 +174,72 @@ export function APIKeysPage() {
         </Card>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Your API Keys</CardTitle>
-          <CardDescription>Keys for accessing the Vehicore API</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading && apiKeys.length === 0 ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-            </div>
-          ) : apiKeys.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No API keys found. Create one to get started.</p>
-          ) : (
-            <div className="space-y-4">
-              <div className="rounded-md border">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="px-4 py-3 text-left text-sm font-medium">Name</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Key</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Created</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium">Last Used</th>
-                      <th className="px-4 py-3 text-right text-sm font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {apiKeys.map((key) => {
-                      const keyId = key.id || key._id || ''
-                      return (
-                        <tr key={keyId} className="border-b">
-                          <td className="px-4 py-3 text-sm">{key.name}</td>
-                          <td className="px-4 py-3 text-sm font-mono">
-                            {key.prefix ? (
-                              <div className="flex items-center gap-2">
-                                <span className="truncate max-w-[200px]">{key.prefix}...</span>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 px-2"
-                                  onClick={() => handleCopy(key.prefix || '', keyId)}
-                                >
-                                  {copiedKeyId === keyId ? 'Copied!' : 'Copy'}
-                                </Button>
-                              </div>
-                            ) : (
-                              <span className="text-muted-foreground">••••••••</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-muted-foreground">
-                            {formatDate(key.createdAt)}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-muted-foreground">
-                            {formatDate(key.lastUsedAt)}
-                          </td>
-                          <td className="px-4 py-3 text-right">
+      {loading && apiKeys.length === 0 ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        </div>
+      ) : apiKeys.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No API keys found. Create one to get started.</p>
+      ) : (
+        <div className="space-y-4">
+          <div className="rounded-md border">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="px-4 py-3 text-left text-sm font-medium">Name</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">Key</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">Created</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">Last Used</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {apiKeys.map((key) => {
+                  const keyId = key.id || key._id || ''
+                  return (
+                    <tr key={keyId} className="border-b">
+                      <td className="px-4 py-3 text-sm">{key.name}</td>
+                      <td className="px-4 py-3 text-sm font-mono">
+                        {key.prefix ? (
+                          <div className="flex items-center gap-2">
+                            <span className="truncate max-w-[200px]">{key.prefix}...</span>
                             <Button
-                              variant="destructive"
+                              variant="ghost"
                               size="sm"
-                              onClick={() => handleDelete(keyId)}
-                              disabled={!keyId}
+                              className="h-6 px-2"
+                              onClick={() => handleCopy(key.prefix || '', keyId)}
                             >
-                              Delete
+                              {copiedKeyId === keyId ? 'Copied!' : 'Copy'}
                             </Button>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">••••••••</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {formatDate(key.createdAt)}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {formatDate(key.lastTimeUsedAt ?? key.lastUsedAt)}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDelete(keyId)}
+                          disabled={!keyId}
+                        >
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>

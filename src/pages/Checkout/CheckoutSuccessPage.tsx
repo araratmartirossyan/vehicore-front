@@ -19,9 +19,6 @@ export function CheckoutSuccessPage() {
       return
     }
 
-    let pollTimer: ReturnType<typeof setInterval>
-    let timeoutTimer: ReturnType<typeof setTimeout>
-
     const pollUsage = async () => {
       try {
         const overview = await refresh()
@@ -34,27 +31,27 @@ export function CheckoutSuccessPage() {
 
         if (hasCredits || hasPurchases) {
           setPolling(false)
-          if (pollTimer) clearInterval(pollTimer)
-          if (timeoutTimer) clearTimeout(timeoutTimer)
+          clearInterval(pollTimer)
+          clearTimeout(timeoutTimer)
         }
       } catch (error) {
         console.error('Failed to fetch usage:', error)
       }
     }
 
-    // Start polling
+    // Start polling immediately
     pollUsage()
-    pollTimer = setInterval(pollUsage, POLL_INTERVAL)
+    const pollTimer: ReturnType<typeof setInterval> = setInterval(pollUsage, POLL_INTERVAL)
 
     // Stop polling after max time
-    timeoutTimer = setTimeout(() => {
+    const timeoutTimer: ReturnType<typeof setTimeout> = setTimeout(() => {
       setPolling(false)
-      if (pollTimer) clearInterval(pollTimer)
+      clearInterval(pollTimer)
     }, MAX_POLL_TIME)
 
     return () => {
-      if (pollTimer) clearInterval(pollTimer)
-      if (timeoutTimer) clearTimeout(timeoutTimer)
+      clearInterval(pollTimer)
+      clearTimeout(timeoutTimer)
     }
   }, [sessionId, refresh])
 

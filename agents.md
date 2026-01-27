@@ -64,6 +64,8 @@ vehicore-dashboard/
 
 ## How to Run, Lint, and Build
 
+USE NPM ONLY
+
 ### Prerequisites
 - Node.js 18+ and npm
 

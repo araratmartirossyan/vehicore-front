@@ -130,9 +130,12 @@ export interface ApiKey {
   _id?: string
   name: string
   key?: string // Only present when first created
+  apiKey?: string // Some backends return plaintext key in list responses (handle carefully)
   prefix?: string // Shown in list view
   createdAt: string
   lastUsedAt?: string
+  // Some backends use a different field name and may return null when never used.
+  lastTimeUsedAt?: string | null
   // Some APIs keep revoked keys in list responses; these fields help us hide them in UI.
   revoked?: boolean
   isRevoked?: boolean

@@ -162,21 +162,6 @@ export function UsagePage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Status</CardTitle>
-              <CardDescription>Current usage status from the API</CardDescription>
-            </CardHeader>
-            <CardContent className="flex items-center justify-between gap-4">
-              <div className="text-sm">
-                <span className="text-muted-foreground">Status: </span>
-                <span className="font-medium">{overview?.status || '—'}</span>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => refresh()} disabled={loading}>
-                Refresh
-              </Button>
-            </CardContent>
-          </Card>
 
           {/* Controls */}
           <Card>

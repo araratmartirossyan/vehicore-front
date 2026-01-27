@@ -1,22 +1,10 @@
-import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { useApiKeys } from '../hooks/useApiKeys'
 import { useAuth } from '../hooks/useAuth'
 
 export function SmartRedirect() {
   const { isAuthenticated, authLoading } = useAuth()
-  const { apiKeys, loading, listApiKeys } = useApiKeys()
-  const [hasChecked, setHasChecked] = useState(false)
 
-  useEffect(() => {
-    if (isAuthenticated && !hasChecked) {
-      listApiKeys().finally(() => {
-        setHasChecked(true)
-      })
-    }
-  }, [isAuthenticated, hasChecked, listApiKeys])
-
-  if (authLoading || (isAuthenticated && (loading || !hasChecked))) {
+  if (authLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-muted-foreground">Loading...</div>
@@ -28,9 +16,9 @@ export function SmartRedirect() {
     return <Navigate to="/login" replace />
   }
 
-  // Check if any key has been used (has lastUsedAt timestamp)
-  const hasAnyUsedKey = apiKeys.some((k) => !!k.lastUsedAt)
-
-  // If user has used their key, go to Usage; otherwise, go to Dashboard (onboarding)
-  return <Navigate to={hasAnyUsedKey ? '/usage' : '/dashboard'} replace />
+  // Dashboard now has 2 states:
+  // 1) onboarding (first time / never-used key)
+  // 2) usage dashboard (when used at least once)
+  // So we always land on /dashboard and let it decide what to render.
+  return <Navigate to="/dashboard" replace />
 }
