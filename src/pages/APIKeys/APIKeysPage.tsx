@@ -15,7 +15,9 @@ import {
   DialogTitle,
 } from '../../components/ui/dialog'
 import { useApiKeys } from '../../hooks/useApiKeys'
+import { useToast } from '../../components/ui/toast'
 import type { CreateApiKeyResponse } from '../../api/types/api.d'
+import { useI18n } from '../../i18n'
 
 const createApiKeySchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
@@ -26,11 +28,13 @@ type CreateApiKeyFormData = z.infer<typeof createApiKeySchema>
 export function APIKeysPage() {
   const { apiKeys, loading, newlyCreatedKey, listApiKeys, createApiKey, deleteApiKey, clearNewlyCreatedKey } =
     useApiKeys()
+  const { showToast } = useToast()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null)
   const [showNewKey, setShowNewKey] = useState<CreateApiKeyResponse | null>(null)
   const [userActionError, setUserActionError] = useState<string | null>(null)
   const hasLoadedRef = useRef(false)
+  const { t } = useI18n()
 
   const {
     register,
@@ -68,20 +72,39 @@ export function APIKeysPage() {
         (err as Error)?.message ||
         'Failed to create API key. Please check the endpoint or try again.'
       setUserActionError(errorMessage)
+      showToast({
+        title: t('apiKeys.createErrorTitle') || 'Failed to create API key',
+        description: errorMessage,
+        variant: 'destructive',
+      })
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
+    if (
+      window.confirm(
+        t('apiKeys.deleteConfirm') ||
+          'Are you sure you want to delete this API key? This action cannot be undone.'
+      )
+    ) {
       setUserActionError(null)
       try {
         await deleteApiKey(id)
+        showToast({
+          title: t('apiKeys.deleteSuccessTitle') || 'API key deleted',
+          description: t('apiKeys.deleteSuccessDescription') || 'The API key was deleted successfully.',
+        })
       } catch (err) {
         const errorMessage =
           (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
           (err as Error)?.message ||
           'Failed to delete API key. Please try again.'
         setUserActionError(errorMessage)
+        showToast({
+          title: t('apiKeys.deleteErrorTitle') || 'Failed to delete API key',
+          description: errorMessage,
+          variant: 'destructive',
+        })
       }
     }
   }
@@ -97,7 +120,7 @@ export function APIKeysPage() {
   }
 
   const formatDate = (dateString?: string | null) => {
-    if (!dateString) return 'Never'
+    if (!dateString) return t('apiKeys.never') || 'Never'
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -111,10 +134,10 @@ export function APIKeysPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">API Keys</h1>
-          <p className="text-muted-foreground">Manage your API keys for accessing the Vehicore API</p>
+          <h1 className="text-3xl font-bold">{t('apiKeys.title')}</h1>
+          <p className="text-muted-foreground">{t('apiKeys.subtitle')}</p>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>Create API Key</Button>
+        <Button onClick={() => setIsCreateDialogOpen(true)}>{t('apiKeys.createButton')}</Button>
       </div>
 
       {userActionError && (
@@ -128,7 +151,7 @@ export function APIKeysPage() {
                 onClick={() => setUserActionError(null)}
                 className="h-6 w-6 p-0"
               >
-                ×
+                {t('apiKeys.errorDismiss') || '×'}
               </Button>
             </div>
           </CardContent>
@@ -138,14 +161,16 @@ export function APIKeysPage() {
       {showNewKey && (
         <Card className="border-green-500 bg-green-50 dark:bg-green-950">
           <CardHeader>
-            <CardTitle className="text-green-700 dark:text-green-400">API Key Created!</CardTitle>
+            <CardTitle className="text-green-700 dark:text-green-400">
+              {t('apiKeys.createdTitle')}
+            </CardTitle>
             <CardDescription className="text-green-600 dark:text-green-300">
-              Make sure to copy your API key now. You won't be able to see it again.
+              {t('apiKeys.createdSubtitle')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>API Key</Label>
+              <Label>{t('apiKeys.createdLabel')}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   value={showNewKey.apiKey}
@@ -157,7 +182,9 @@ export function APIKeysPage() {
                   size="sm"
                   onClick={() => handleCopy(showNewKey.apiKey, showNewKey.id || showNewKey._id || '')}
                 >
-                  {copiedKeyId === (showNewKey.id || showNewKey._id) ? 'Copied!' : 'Copy'}
+                  {copiedKeyId === (showNewKey.id || showNewKey._id)
+                    ? t('apiKeys.copied')
+                    : t('apiKeys.copy')}
                 </Button>
               </div>
             </div>
@@ -168,7 +195,7 @@ export function APIKeysPage() {
                 clearNewlyCreatedKey()
               }}
             >
-              I've saved my key
+              {t('apiKeys.savedButton')}
             </Button>
           </CardContent>
         </Card>
@@ -179,18 +206,28 @@ export function APIKeysPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
         </div>
       ) : apiKeys.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No API keys found. Create one to get started.</p>
+        <p className="text-sm text-muted-foreground">{t('apiKeys.empty')}</p>
       ) : (
         <div className="space-y-4">
           <div className="rounded-md border">
             <table className="w-full">
               <thead>
                 <tr className="border-b bg-muted/50">
-                  <th className="px-4 py-3 text-left text-sm font-medium">Name</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Key</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Created</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Last Used</th>
-                  <th className="px-4 py-3 text-right text-sm font-medium">Actions</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    {t('apiKeys.table.name')}
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    {t('apiKeys.table.key')}
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    {t('apiKeys.table.created')}
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    {t('apiKeys.table.lastUsed')}
+                  </th>
+                  <th className="px-4 py-3 text-right text-sm font-medium">
+                    {t('apiKeys.table.actions')}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -209,11 +246,13 @@ export function APIKeysPage() {
                               className="h-6 px-2"
                               onClick={() => handleCopy(key.prefix || '', keyId)}
                             >
-                              {copiedKeyId === keyId ? 'Copied!' : 'Copy'}
+                              {copiedKeyId === keyId ? t('apiKeys.copied') : t('apiKeys.copy')}
                             </Button>
                           </div>
                         ) : (
-                          <span className="text-muted-foreground">••••••••</span>
+                          <span className="text-muted-foreground">
+                            {t('apiKeys.table.hiddenKey')}
+                          </span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">
@@ -229,7 +268,7 @@ export function APIKeysPage() {
                           onClick={() => handleDelete(keyId)}
                           disabled={!keyId}
                         >
-                          Delete
+                          {t('apiKeys.delete')}
                         </Button>
                       </td>
                     </tr>
@@ -244,18 +283,15 @@ export function APIKeysPage() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create API Key</DialogTitle>
-            <DialogDescription>
-              Create a new API key to access the Vehicore API. Give it a descriptive name to help you
-              identify it later.
-            </DialogDescription>
+            <DialogTitle>{t('apiKeys.dialog.title')}</DialogTitle>
+            <DialogDescription>{t('apiKeys.dialog.description')}</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t('apiKeys.dialog.nameLabel')}</Label>
               <Input
                 id="name"
-                placeholder="My API Key"
+                placeholder={t('apiKeys.dialog.namePlaceholder')}
                 {...register('name')}
                 disabled={loading}
               />
@@ -273,10 +309,10 @@ export function APIKeysPage() {
                 }}
                 disabled={loading}
               >
-                Cancel
+                {t('apiKeys.dialog.cancel')}
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? 'Creating...' : 'Create API Key'}
+                {loading ? t('apiKeys.dialog.submitting') : t('apiKeys.dialog.submit')}
               </Button>
             </DialogFooter>
           </form>

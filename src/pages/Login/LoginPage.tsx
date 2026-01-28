@@ -10,10 +10,14 @@ import { Label } from '../../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { useAuth } from '../../hooks/useAuth'
 import { loginSchema, type LoginFormData } from '../../utils/validators'
+import { useToast } from '../../components/ui/toast'
+import { useI18n } from '../../i18n'
 
 export function LoginPage() {
   const navigate = useNavigate()
   const { login, isAuthenticated, authLoading, authError } = useAuth()
+  const { showToast } = useToast()
+  const { t } = useI18n()
 
   const {
     register,
@@ -29,6 +33,12 @@ export function LoginPage() {
     }
   }, [isAuthenticated, navigate])
 
+  useEffect(() => {
+    if (authError) {
+      showToast({ title: 'Login failed', description: authError, variant: 'destructive' })
+    }
+  }, [authError, showToast])
+
   const onSubmit = async (data: LoginFormData) => {
     await login(data)
     if (isAuthenticated) {
@@ -40,18 +50,17 @@ export function LoginPage() {
     <AuthLayout>
       <Card>
         <CardHeader>
-          <CardTitle>Sign in to your account</CardTitle>
-          <CardDescription>Enter your email and password to continue</CardDescription>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <CardTitle>{t('login.title')}</CardTitle>
+              <CardDescription>{t('login.subtitle')}</CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {authError && (
-              <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-                {authError}
-              </div>
-            )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('login.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -64,12 +73,12 @@ export function LoginPage() {
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('login.password')}</Label>
                 <Link
                   to="/forgot-password"
                   className="text-sm text-primary font-medium underline underline-offset-4 hover:text-primary/80"
                 >
-                  Forgot password?
+                  {t('login.forgotPassword')}
                 </Link>
               </div>
               <PasswordInput
@@ -82,13 +91,13 @@ export function LoginPage() {
               )}
             </div>
             <Button type="submit" className="w-full" disabled={authLoading}>
-              {authLoading ? 'Signing in...' : 'Sign in'}
+              {authLoading ? `${t('login.signIn')}...` : t('login.signIn')}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Don't have an account?{' '}
+            {t('login.signupPrompt')}{' '}
             <Link to="/signup" className="text-primary font-medium underline underline-offset-4 hover:text-primary/80">
-              Sign up
+              {t('login.signupLink')}
             </Link>
           </div>
         </CardContent>

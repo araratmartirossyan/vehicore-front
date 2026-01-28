@@ -4,12 +4,14 @@ import { AuthLayout } from '../../components/layout/AuthLayout'
 import { Button } from '../../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { authRepository } from '../../api/repositories/auth.repo'
+import { useI18n } from '../../i18n'
 
 export function ConfirmEmailPage() {
   const [searchParams] = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { t } = useI18n()
   const token = searchParams.get('token') || ''
 
   useEffect(() => {
@@ -42,8 +44,8 @@ export function ConfirmEmailPage() {
       <AuthLayout>
         <Card>
           <CardHeader>
-            <CardTitle>Confirming your email</CardTitle>
-            <CardDescription>Please wait...</CardDescription>
+            <CardTitle>{t('confirmEmail.loadingTitle')}</CardTitle>
+            <CardDescription>{t('confirmEmail.loadingSubtitle')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-center py-8">
@@ -60,17 +62,17 @@ export function ConfirmEmailPage() {
       <AuthLayout>
         <Card>
           <CardHeader>
-            <CardTitle>Email confirmed!</CardTitle>
-            <CardDescription>Your email has been successfully verified</CardDescription>
+            <CardTitle>{t('confirmEmail.successTitle')}</CardTitle>
+            <CardDescription>{t('confirmEmail.successSubtitle')}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6 pt-6">
+          <CardContent className="space-y-6">
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                You can now sign in to your account.
+              <p className="text-sm text-muted-foreground pb-4">
+                {t('confirmEmail.successBody')}
               </p>
             </div>
             <Link to="/login">
-              <Button className="w-full">Go to login</Button>
+              <Button className="w-full">{t('confirmEmail.goToLogin')}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -82,20 +84,20 @@ export function ConfirmEmailPage() {
     <AuthLayout>
       <Card>
         <CardHeader>
-          <CardTitle>Email confirmation failed</CardTitle>
-          <CardDescription>We couldn't confirm your email address</CardDescription>
+          <CardTitle>{t('confirmEmail.errorTitle')}</CardTitle>
+          <CardDescription>{t('confirmEmail.errorSubtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
           <p className="text-sm text-destructive">{error}</p>
           <div className="flex flex-col gap-3">
             <Link to="/login">
               <Button variant="outline" className="w-full">
-                Go to login
+                {t('confirmEmail.goToLogin')}
               </Button>
             </Link>
             <Link to="/signup">
               <Button variant="ghost" className="w-full">
-                Sign up again
+                {t('confirmEmail.signUpAgain')}
               </Button>
             </Link>
           </div>

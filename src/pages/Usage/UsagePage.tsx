@@ -4,6 +4,7 @@ import { DateRangePicker } from '../../components/ui/date-range-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select'
 import { PurchasesChart } from '../../components/usage/PurchasesChart'
 import { useUsageView } from '../../hooks/useUsageView'
+import { useI18n } from '../../i18n'
 
 function formatNumber(n: number): string {
   return new Intl.NumberFormat('en-US').format(n)
@@ -29,12 +30,13 @@ export function UsagePage() {
     hoveredProductCredits,
     setHoveredProductCredits,
   } = useUsageView()
+  const { t } = useI18n()
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Usage</h1>
-        <p className="text-muted-foreground">Your API keys, credits, and purchases</p>
+        <h1 className="text-3xl font-bold">{t('usage.title')}</h1>
+        <p className="text-muted-foreground">{t('usage.subtitle')}</p>
       </div>
 
       {error && (
@@ -42,7 +44,7 @@ export function UsagePage() {
           <CardContent className="pt-6 flex items-center justify-between gap-4">
             <p className="text-sm text-destructive">{error}</p>
             <Button variant="outline" size="sm" onClick={() => refresh()} disabled={loading}>
-              Retry
+                {t('usage.errorRetry')}
             </Button>
           </CardContent>
         </Card>
@@ -60,8 +62,8 @@ export function UsagePage() {
         <div className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Overview</CardTitle>
-              <CardDescription>Filter by key and date range</CardDescription>
+              <CardTitle>{t('usage.overviewTitle')}</CardTitle>
+              <CardDescription>{t('usage.overviewSubtitle')}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div className="flex flex-wrap items-center gap-3">
@@ -76,10 +78,10 @@ export function UsagePage() {
                 <div className="min-w-[260px]">
                   <Select value={selectedKeyId} onValueChange={setSelectedKeyId}>
                     <SelectTrigger>
-                      <SelectValue placeholder="All keys" />
+                      <SelectValue placeholder={t('usage.keySelect.placeholder')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All keys</SelectItem>
+                      <SelectItem value="all">{t('usage.keySelect.all')}</SelectItem>
                       {keyOptions.map((k) => (
                         <SelectItem key={k.id} value={k.id}>
                           {k.label}
@@ -90,7 +92,7 @@ export function UsagePage() {
                 </div>
 
                 <Button variant="outline" size="sm" onClick={() => refresh()} disabled={loading}>
-                  Refresh
+                  {t('usage.refresh')}
                 </Button>
               </div>
             </CardContent>
@@ -99,8 +101,8 @@ export function UsagePage() {
           <div className="grid gap-4 md:grid-cols-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm">Total Purchased Credits</CardTitle>
-                <CardDescription>All-time (from usage response)</CardDescription>
+                <CardTitle className="text-sm">{t('usage.card.totalPurchased')}</CardTitle>
+                <CardDescription>{t('usage.card.totalPurchasedSubtitle')}</CardDescription>
               </CardHeader>
               <CardContent className="text-2xl font-bold">
                 {formatNumber(totals.totalPurchasedCredits)}
@@ -108,8 +110,8 @@ export function UsagePage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm">Total Remaining Credits</CardTitle>
-                <CardDescription>Current (from usage response)</CardDescription>
+                <CardTitle className="text-sm">{t('usage.card.totalRemaining')}</CardTitle>
+                <CardDescription>{t('usage.card.totalRemainingSubtitle')}</CardDescription>
               </CardHeader>
               <CardContent className="text-2xl font-bold">
                 {formatNumber(totals.totalRemainingCredits)}
@@ -117,7 +119,7 @@ export function UsagePage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm">Purchases (period)</CardTitle>
+                <CardTitle className="text-sm">{t('usage.card.purchasesPeriod')}</CardTitle>
                 <CardDescription>
                   {from} → {to}
                 </CardDescription>
@@ -126,8 +128,8 @@ export function UsagePage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm">API Keys</CardTitle>
-                <CardDescription>Keys linked to your account</CardDescription>
+                <CardTitle className="text-sm">{t('usage.card.apiKeys')}</CardTitle>
+                <CardDescription>{t('usage.card.apiKeysSubtitle')}</CardDescription>
               </CardHeader>
               <CardContent className="text-2xl font-bold">{formatNumber(totals.keysCount)}</CardContent>
             </Card>
@@ -138,20 +140,20 @@ export function UsagePage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Credits by product</CardTitle>
-                <CardDescription>Used vs remaining</CardDescription>
+                <CardTitle>{t('usage.creditsByProductTitle')}</CardTitle>
+                <CardDescription>{t('usage.creditsByProductSubtitle')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <span className="inline-flex items-center gap-2">
                     <span className="h-2 w-2 rounded bg-primary" />
-                    Used
+                    {t('usage.legend.used')}
                   </span>
                   <span className="inline-flex items-center gap-2">
                     <span className="h-2 w-2 rounded bg-emerald-500/50" />
-                    Remaining
+                    {t('usage.legend.remaining')}
                   </span>
-                  <span className="text-muted-foreground/70">Hover bar for details</span>
+                  <span className="text-muted-foreground/70">{t('usage.legend.hint')}</span>
                 </div>
 
                 {productStats.length ? (
@@ -266,7 +268,7 @@ export function UsagePage() {
                     )
                   })
                 ) : (
-                  <p className="text-sm text-muted-foreground">No product data.</p>
+                  <p className="text-sm text-muted-foreground">{t('usage.noProductData')}</p>
                 )}
 
                 {hoveredProductCredits && (
@@ -279,7 +281,9 @@ export function UsagePage() {
                   >
                     <div className="font-medium">{hoveredProductCredits.product}</div>
                     <div className="text-muted-foreground">
-                      {hoveredProductCredits.segment === 'used' ? 'Used credits' : 'Remaining credits'}
+                    {hoveredProductCredits.segment === 'used'
+                      ? t('usage.tooltip.used')
+                      : t('usage.tooltip.remaining')}
                     </div>
                     <div className="mt-1">
                       {hoveredProductCredits.segment === 'used' ? (
