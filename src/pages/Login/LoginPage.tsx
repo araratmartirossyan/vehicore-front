@@ -11,13 +11,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { useAuth } from '../../hooks/useAuth'
 import { loginSchema, type LoginFormData } from '../../utils/validators'
 import { useToast } from '../../components/ui/toast'
-import { useI18n, SUPPORTED_LANGUAGES } from '../../i18n'
+import { useI18n } from '../../i18n'
 
 export function LoginPage() {
   const navigate = useNavigate()
   const { login, isAuthenticated, authLoading, authError } = useAuth()
   const { showToast } = useToast()
-  const { t, language, setLanguage } = useI18n()
+  const { t } = useI18n()
 
   const {
     register,
