@@ -9,10 +9,12 @@ import { Label } from '../../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { useAuth } from '../../hooks/useAuth'
 import { forgotPasswordSchema, type ForgotPasswordFormData } from '../../utils/validators'
+import { useI18n } from '../../i18n'
 
 export function ForgotPasswordPage() {
   const [success, setSuccess] = useState(false)
   const { forgotPassword, authLoading } = useAuth()
+  const { t } = useI18n()
 
   const {
     register,
@@ -36,16 +38,16 @@ export function ForgotPasswordPage() {
       <AuthLayout>
         <Card>
           <CardHeader>
-            <CardTitle>Check your email</CardTitle>
-            <CardDescription>We've sent you a password reset link</CardDescription>
+            <CardTitle>{t('forgotPassword.checkEmailTitle')}</CardTitle>
+            <CardDescription>{t('forgotPassword.checkEmailSubtitle')}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              If an account exists with this email, you'll receive a password reset link shortly.
+              {t('forgotPassword.checkEmailBody')}
             </p>
             <Link to="/login">
               <Button variant="outline" className="w-full">
-                Back to login
+                {t('forgotPassword.backToLogin')}
               </Button>
             </Link>
           </CardContent>
@@ -58,15 +60,13 @@ export function ForgotPasswordPage() {
     <AuthLayout>
       <Card>
         <CardHeader>
-          <CardTitle>Forgot your password?</CardTitle>
-          <CardDescription>
-            Enter your email address and we'll send you a link to reset your password
-          </CardDescription>
+          <CardTitle>{t('forgotPassword.title')}</CardTitle>
+          <CardDescription>{t('forgotPassword.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('forgotPassword.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -78,13 +78,13 @@ export function ForgotPasswordPage() {
               )}
             </div>
             <Button type="submit" className="w-full" disabled={authLoading}>
-              {authLoading ? 'Sending...' : 'Send reset link'}
+              {authLoading ? t('forgotPassword.submitting') : t('forgotPassword.submit')}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Remember your password?{' '}
+            {t('forgotPassword.rememberPrompt')}{' '}
             <Link to="/login" className="text-primary font-medium underline underline-offset-4 hover:text-primary/80">
-              Sign in
+              {t('login.signIn')}
             </Link>
           </div>
         </CardContent>
