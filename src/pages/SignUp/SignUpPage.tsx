@@ -10,11 +10,13 @@ import { Label } from '../../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { useAuth } from '../../hooks/useAuth'
 import { signUpSchema, type SignUpFormData } from '../../utils/validators'
+import { useI18n } from '../../i18n'
 
 export function SignUpPage() {
   const navigate = useNavigate()
   const { signUp, isAuthenticated, authLoading, authError } = useAuth()
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false)
+  const { t } = useI18n()
 
   const {
     register,
@@ -52,18 +54,15 @@ export function SignUpPage() {
       <AuthLayout>
         <Card>
           <CardHeader>
-            <CardTitle>Check your email</CardTitle>
-            <CardDescription>We've sent you a confirmation link</CardDescription>
+            <CardTitle>{t('signup.checkEmailTitle')}</CardTitle>
+            <CardDescription>{t('signup.checkEmailSubtitle')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Please check your email inbox and click the confirmation link to verify your account.
-              You'll be able to sign in after confirming your email.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('signup.checkEmailBody')}</p>
             <div className="flex flex-col gap-2">
               <Link to="/login">
                 <Button variant="outline" className="w-full">
-                  Go to login
+                  {t('signup.goToLogin')}
                 </Button>
               </Link>
               <Button
@@ -71,7 +70,7 @@ export function SignUpPage() {
                 className="w-full"
                 onClick={() => setShowEmailConfirmation(false)}
               >
-                Back to sign up
+                {t('signup.backToSignup')}
               </Button>
             </div>
           </CardContent>
@@ -84,8 +83,8 @@ export function SignUpPage() {
     <AuthLayout>
       <Card>
         <CardHeader>
-          <CardTitle>Create an account</CardTitle>
-          <CardDescription>Enter your information to get started</CardDescription>
+          <CardTitle>{t('signup.title')}</CardTitle>
+          <CardDescription>{t('signup.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -95,7 +94,7 @@ export function SignUpPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="firstName">First name</Label>
+              <Label htmlFor="firstName">{t('signup.firstName')}</Label>
               <Input
                 id="firstName"
                 placeholder="John"
@@ -106,7 +105,7 @@ export function SignUpPage() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastName">Last name</Label>
+              <Label htmlFor="lastName">{t('signup.lastName')}</Label>
               <Input
                 id="lastName"
                 placeholder="Doe"
@@ -117,7 +116,7 @@ export function SignUpPage() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('signup.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -129,22 +128,19 @@ export function SignUpPage() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('signup.password')}</Label>
               <PasswordInput
                 id="password"
                 placeholder="Enter a strong password"
                 {...register('password')}
               />
-              <p className="text-xs text-muted-foreground">
-                Password must be at least 8 characters and include uppercase, lowercase, number, and
-                special character
-              </p>
+              <p className="text-xs text-muted-foreground">{t('signup.passwordHint')}</p>
               {errors.password && (
                 <p className="text-sm text-destructive">{errors.password.message}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t('signup.confirmPassword')}</Label>
               <PasswordInput
                 id="confirmPassword"
                 placeholder="Re-enter your password"
@@ -155,13 +151,13 @@ export function SignUpPage() {
               )}
             </div>
             <Button type="submit" className="w-full" disabled={authLoading}>
-              {authLoading ? 'Creating account...' : 'Create account'}
+              {authLoading ? t('signup.submitting') : t('signup.submit')}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Already have an account?{' '}
+            {t('signup.alreadyHaveAccount')}{' '}
             <Link to="/login" className="text-primary font-medium underline underline-offset-4 hover:text-primary/80">
-              Sign in
+              {t('signup.signInLink')}
             </Link>
           </div>
         </CardContent>

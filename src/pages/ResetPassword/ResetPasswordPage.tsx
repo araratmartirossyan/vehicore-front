@@ -10,6 +10,7 @@ import { Label } from '../../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { useAuth } from '../../hooks/useAuth'
 import { resetPasswordSchema, type ResetPasswordFormData } from '../../utils/validators'
+import { useI18n } from '../../i18n'
 
 export function ResetPasswordPage() {
   const [success, setSuccess] = useState(false)
@@ -17,6 +18,7 @@ export function ResetPasswordPage() {
   const navigate = useNavigate()
   const { resetPassword, authLoading } = useAuth()
   const token = searchParams.get('token') || ''
+  const { t } = useI18n()
 
   const {
     register,
@@ -52,15 +54,15 @@ export function ResetPasswordPage() {
       <AuthLayout>
         <Card>
           <CardHeader>
-            <CardTitle>Password reset successful</CardTitle>
-            <CardDescription>Your password has been updated</CardDescription>
+            <CardTitle>{t('resetPassword.successTitle')}</CardTitle>
+            <CardDescription>{t('resetPassword.successSubtitle')}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              You can now sign in with your new password.
+              {t('resetPassword.successBody')}
             </p>
             <Link to="/login">
-              <Button className="w-full">Go to login</Button>
+              <Button className="w-full">{t('resetPassword.goToLogin')}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -72,17 +74,17 @@ export function ResetPasswordPage() {
     <AuthLayout>
       <Card>
         <CardHeader>
-          <CardTitle>Reset your password</CardTitle>
-          <CardDescription>Enter your new password below</CardDescription>
+          <CardTitle>{t('resetPassword.title')}</CardTitle>
+          <CardDescription>{t('resetPassword.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {!token && (
               <div className="space-y-2">
-                <Label htmlFor="token">Reset Token</Label>
+                <Label htmlFor="token">{t('resetPassword.tokenLabel')}</Label>
                 <Input
                   id="token"
-                  placeholder="Paste your reset token here"
+                  placeholder={t('resetPassword.tokenPlaceholder')}
                   {...register('token')}
                 />
                 {errors.token && (
@@ -91,22 +93,19 @@ export function ResetPasswordPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
+              <Label htmlFor="newPassword">{t('resetPassword.newPassword')}</Label>
               <PasswordInput
                 id="newPassword"
                 placeholder="Enter a strong password"
                 {...register('newPassword')}
               />
-              <p className="text-xs text-muted-foreground">
-                Password must be at least 8 characters and include uppercase, lowercase, number, and
-                special character
-              </p>
+              <p className="text-xs text-muted-foreground">{t('resetPassword.passwordHint')}</p>
               {errors.newPassword && (
                 <p className="text-sm text-destructive">{errors.newPassword.message}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t('resetPassword.confirmPassword')}</Label>
               <PasswordInput
                 id="confirmPassword"
                 placeholder="Re-enter your new password"
@@ -117,12 +116,12 @@ export function ResetPasswordPage() {
               )}
             </div>
             <Button type="submit" className="w-full" disabled={authLoading}>
-              {authLoading ? 'Resetting...' : 'Reset password'}
+              {authLoading ? t('resetPassword.submitting') : t('resetPassword.submit')}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
             <Link to="/login" className="text-primary font-medium underline underline-offset-4 hover:text-primary/80">
-              Back to login
+              {t('resetPassword.backToLogin')}
             </Link>
           </div>
         </CardContent>
